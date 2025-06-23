@@ -1,0 +1,31 @@
+{
+  "productName": "Focus Task Manager",
+  "version": "1.0.0",
+  "identifier": "com.focus.taskmanager",
+  "build": {
+    "beforeBuildCommand": "npm run prepare-dist",
+    "beforeDevCommand": "npm run prepare-dist",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Focus Task Manager",
+        "width": 800,
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/icon.png"
+    ]
+  }
+}

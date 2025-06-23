@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(24, 24, 27, 0.8) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(39, 39, 42, 0.8) 0%, transparent 50%),
+                linear-gradient(145deg, #09090b 0%, #18181b 30%, #0f0f0f 70%, #09090b 100%);
+            color: #f4f4f5;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            --primary-glow: rgba(161, 161, 170, 0.15);
+            --secondary-glow: rgba(113, 113, 122, 0.1);
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                conic-gradient(from 180deg at 50% 50%, rgba(82, 82, 91, 0.05) 0deg, rgba(161, 161, 170, 0.1) 180deg, rgba(82, 82, 91, 0.05) 360deg),
+                linear-gradient(45deg, transparent 30%, rgba(244, 244, 245, 0.02) 50%, transparent 70%);
+            pointer-events: none;
+            animation: shimmer 20s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(161, 161, 170, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(161, 161, 170, 0); }
+        }
+
+        .settings-container {
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.04) 100%),
+                linear-gradient(45deg, transparent, rgba(161, 161, 170, 0.05), transparent);
+            border: 1px solid rgba(244, 244, 245, 0.08);
+            border-radius: 16px;
+            padding: 28px;
+            backdrop-filter: blur(24px) saturate(180%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .settings-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.3), transparent);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .settings-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.05), transparent);
+            animation: sweep 3s ease-in-out infinite;
+        }
+
+        @keyframes sweep {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .settings-header {
+            font-size: 22px;
+            font-weight: 600;
+            color: #f4f4f5;
+            margin-bottom: 28px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid rgba(244, 244, 245, 0.08);
+            padding-bottom: 16px;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #f4f4f5 0%, #d4d4d8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .settings-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(244, 244, 245, 0.6), transparent);
+            border-radius: 1px;
+        }
+
+        .setting-group {
+            margin-bottom: 28px;
+            animation: slideIn 0.6s ease-out backwards;
+        }
+
+        .setting-group:nth-child(2) { animation-delay: 0.1s; }
+        .setting-group:nth-child(3) { animation-delay: 0.2s; }
+        .setting-group:nth-child(4) { animation-delay: 0.3s; }
+
+        .setting-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f4f4f5;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.075em;
+            background: linear-gradient(135deg, #f4f4f5 0%, #d4d4d8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .setting-control {
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.06) 0%, rgba(244, 244, 245, 0.02) 100%),
+                linear-gradient(45deg, transparent 30%, rgba(244, 244, 245, 0.02) 50%, transparent 70%);
+            border: 1px solid rgba(244, 244, 245, 0.08);
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: #f4f4f5;
+            font-family: inherit;
+            font-size: 13px;
+            width: 100%;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(16px);
+            outline: none;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .setting-control::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.2), transparent);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .setting-control:focus {
+            border-color: rgba(244, 244, 245, 0.2);
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.04) 100%),
+                linear-gradient(45deg, transparent 30%, rgba(244, 244, 245, 0.04) 50%, transparent 70%);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(244, 244, 245, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.08) 0%, rgba(244, 244, 245, 0.04) 100%);
+            border: 1px solid rgba(244, 244, 245, 0.15);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.3), transparent);
+            border-radius: 14px 14px 0 0;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: 
+                linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%);
+            border-radius: 50%;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #71717a 0%, #52525b 100%);
+            border-color: #71717a;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(244, 244, 245, 0.2);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+            background: linear-gradient(135deg, #ffffff 0%, #f4f4f5 100%);
+        }
+
+        .toggle-switch:hover {
+            transform: scale(1.05);
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.12) 0%, rgba(244, 244, 245, 0.06) 100%);
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(244, 244, 245, 0.04);
+            position: relative;
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #f4f4f5;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+        }
+
+        .setting-description {
+            font-size: 11px;
+            color: rgba(244, 244, 245, 0.6);
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        .color-picker {
+            width: 44px;
+            height: 32px;
+            border: 1px solid rgba(244, 244, 245, 0.15);
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+            padding: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .color-picker::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-picker::-webkit-color-swatch {
+            border: none;
+            border-radius: 6px;
+            margin: 2px;
+        }
+
+        .color-picker:hover {
+            transform: scale(1.05);
+            border-color: rgba(244, 244, 245, 0.25);
+        }
+
+        .range-input {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.05) 100%);
+            outline: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(244, 244, 245, 0.08);
+        }
+
+        .range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%);
+            cursor: pointer;
+            border: 2px solid rgba(244, 244, 245, 0.2);
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .range-input::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 
+                0 6px 16px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .buttons {
+            margin-top: auto;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding-top: 24px;
+            border-top: 1px solid rgba(244, 244, 245, 0.08);
+            animation: slideIn 0.6s ease-out 0.4s backwards;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: 1px solid rgba(244, 244, 245, 0.15);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(16px);
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.05) 100%);
+            color: #f4f4f5;
+            letter-spacing: 0.025em;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.4), transparent);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.15) 0%, rgba(244, 244, 245, 0.08) 100%);
+            border-color: rgba(244, 244, 245, 0.25);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(244, 244, 245, 0.25);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, #71717a 0%, #52525b 100%);
+            border-color: #71717a;
+            color: #ffffff;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(244, 244, 245, 0.2);
+        }
+
+        .btn.primary:hover {
+            background: linear-gradient(135deg, #787887 0%, #5a5a65 100%);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 4px 16px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(244, 244, 245, 0.3);
+        }
+
+        .hotkey-input {
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.06) 0%, rgba(244, 244, 245, 0.02) 100%);
+            border: 1px solid rgba(244, 244, 245, 0.08);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #f4f4f5;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+            font-weight: 500;
+        }
+
+        .hotkey-input:focus {
+            border-color: rgba(244, 244, 245, 0.2);
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.04) 100%);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(244, 244, 245, 0.15);
+        }
+
+        /* Scrollbar for content */
+        .settings-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .settings-container::-webkit-scrollbar-track {
+            background: rgba(244, 244, 245, 0.02);
+            border-radius: 3px;
+        }
+
+        .settings-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, rgba(244, 244, 245, 0.3) 0%, rgba(244, 244, 245, 0.2) 100%);
+            border-radius: 3px;
+            border: 1px solid rgba(244, 244, 245, 0.1);
+        }
+
+        .settings-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, rgba(244, 244, 245, 0.4) 0%, rgba(244, 244, 245, 0.3) 100%);
+        }
+
+        @media (max-height: 600px) {
+            .settings-container {
+                padding: 20px;
+            }
+            
+            .setting-group {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-header">Settings</div>
+
+        <div class="setting-group">
+            <div class="setting-label">Appearance</div>
+            
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-name">Always on Top</div>
+                    <div class="setting-description">Keep window above other applications</div>
+                </div>
+                <div class="toggle-switch" id="alwaysOnTop" onclick="toggleSetting(this)"></div>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-name">Auto-hide</div>
+                    <div class="setting-description">Hide when not in use for 30 seconds</div>
+                </div>
+                <div class="toggle-switch" id="autoHide" onclick="toggleSetting(this)"></div>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-name">Window Opacity</div>
+                    <div class="setting-description">Adjust interface transparency</div>
+                </div>
+                <input type="range" class="range-input" id="opacity" min="0.3" max="1" step="0.1" value="0.9">
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <div class="setting-label">Behavior</div>
+            
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-name">Default Timer</div>
+                    <div class="setting-description">Minutes for new timer sessions</div>
+                </div>
+                <input type="number" class="setting-control" id="defaultTimer" value="25" min="1" max="120" style="width: 80px;">
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-name">Sound Notifications</div>
+                    <div class="setting-description">Play sound when timer completes</div>
+                </div>
+                <div class="toggle-switch active" id="soundNotifications" onclick="toggleSetting(this)"></div>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-name">Auto-save Notes</div>
+                    <div class="setting-description">Automatically save notes as you type</div>
+                </div>
+                <div class="toggle-switch active" id="autoSaveNotes" onclick="toggleSetting(this)"></div>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <div class="setting-label">Shortcuts</div>
+            
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-name">Toggle Visibility</div>
+                    <div class="setting-description">Global hotkey to show/hide window</div>
+                </div>
+                <input type="text" class="hotkey-input" id="toggleHotkey" value="⌘⇧T" readonly placeholder="Click to set">
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-name">Start/Pause Timer</div>
+                    <div class="setting-description">Quick timer control</div>
+                </div>
+                <input type="text" class="hotkey-input" id="timerHotkey" value="⌘Space" readonly placeholder="Click to set">
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn" onclick="resetDefaults()">Reset</button>
+            <button class="btn" onclick="closeSettings()">Cancel</button>
+            <button class="btn primary" onclick="saveSettings()">Save Changes</button>
+        </div>
+    </div>
+
+    <script>
+        // Settings state with enhanced structure
+        let settings = {
+            alwaysOnTop: false,
+            autoHide: false,
+            opacity: 0.9,
+            defaultTimer: 25,
+            soundNotifications: true,
+            autoSaveNotes: true,
+            toggleHotkey: '⌘⇧T',
+            timerHotkey: '⌘Space'
+        };
+
+        // Load and apply settings
+        function loadSettings() {
+            const saved = localStorage.getItem('taskManagerSettings');
+            if (saved) {
+                settings = { ...settings, ...JSON.parse(saved) };
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('alwaysOnTop').classList.toggle('active', settings.alwaysOnTop);
+            document.getElementById('autoHide').classList.toggle('active', settings.autoHide);
+            document.getElementById('soundNotifications').classList.toggle('active', settings.soundNotifications);
+            document.getElementById('autoSaveNotes').classList.toggle('active', settings.autoSaveNotes);
+            
+            document.getElementById('opacity').value = settings.opacity;
+            document.getElementById('defaultTimer').value = settings.defaultTimer;
+            document.getElementById('toggleHotkey').value = settings.toggleHotkey;
+            document.getElementById('timerHotkey').value = settings.timerHotkey;
+        }
+
+        function toggleSetting(element) {
+            element.classList.toggle('active');
+            const settingName = element.id;
+            settings[settingName] = element.classList.contains('active');
+            
+            // Add subtle feedback
+            element.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                element.style.transform = '';
+            }, 150);
+        }
+
+        function saveSettings() {
+            // Collect all current values
+            settings.opacity = parseFloat(document.getElementById('opacity').value);
+            settings.defaultTimer = parseInt(document.getElementById('defaultTimer').value);
+            settings.toggleHotkey = document.getElementById('toggleHotkey').value;
+            settings.timerHotkey = document.getElementById('timerHotkey').value;
+
+            // Save to localStorage
+            localStorage.setItem('taskManagerSettings', JSON.stringify(settings));
+
+            // Send to main process if in Electron
+            if (window.require) {
+                const { ipcRenderer } = window.require('electron');
+                ipcRenderer.send('save-settings', settings);
+            }
+
+            applySettings();
+            closeSettings();
+        }
+
+        function applySettings() {
+            if (window.require) {
+                const { ipcRenderer } = window.require('electron');
+                ipcRenderer.send('apply-settings', settings);
+            } else if (window.opener) {
+                window.opener.postMessage({ type: 'settings-updated', settings }, '*');
+            }
+        }
+
+        function resetDefaults() {
+            settings = {
+                alwaysOnTop: false,
+                autoHide: false,
+                opacity: 0.9,
+                defaultTimer: 25,
+                soundNotifications: true,
+                autoSaveNotes: true,
+                toggleHotkey: '⌘⇧T',
+                timerHotkey: '⌘Space'
+            };
+            updateUI();
+            
+            // Visual feedback
+            document.querySelectorAll('.setting-row').forEach((row, index) => {
+                row.style.animation = 'none';
+                setTimeout(() => {
+                    row.style.animation = `slideIn 0.3s ease-out ${index * 0.05}s backwards`;
+                }, 10);
+            });
+        }
+
+        function closeSettings() {
+            if (window.require) {
+                const { remote } = window.require('electron');
+                remote.getCurrentWindow().close();
+            } else {
+                window.close();
+            }
+        }
+
+        // Enhanced hotkey recording
+        function setupHotkeyInput(inputId) {
+            const input = document.getElementById(inputId);
+            
+            input.addEventListener('click', function() {
+                this.value = 'Press keys...';
+                this.style.background = 'linear-gradient(135deg, rgba(113, 113, 122, 0.2) 0%, rgba(82, 82, 91, 0.1) 100%)';
+                this.focus();
+            });
+
+            input.addEventListener('keydown', function(e) {
+                e.preventDefault();
+                const keys = [];
+                
+                if (e.metaKey) keys.push('⌘');
+                if (e.ctrlKey) keys.push('⌃');
+                if (e.shiftKey) keys.push('⇧');
+                if (e.altKey) keys.push('⌥');
+                
+                if (e.key && !['Meta', 'Control', 'Shift', 'Alt'].includes(e.key)) {
+                    const keyMap = {
+                        ' ': 'Space',
+                        'ArrowUp': '↑',
+                        'ArrowDown': '↓',
+                        'ArrowLeft': '←',
+                        'ArrowRight': '→',
+                        'Enter': '↵',
+                        'Escape': '⎋',
+                        'Tab': '⇥',
+                        'Backspace': '⌫'
+                    };
+                    keys.push(keyMap[e.key] || e.key.toUpperCase());
+                }
+                
+                if (keys.length > 1) {
+                    this.value = keys.join('');
+                    settings[inputId] = this.value;
+                    this.style.background = '';
+                    this.blur();
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                if (this.value === 'Press keys...') {
+                    this.value = settings[inputId];
+                }
+                this.style.background = '';
+            });
+        }
+
+        // Range input live updates
+        document.getElementById('opacity').addEventListener('input', function() {
+            settings.opacity = parseFloat(this.value);
+            
+            // Live preview if possible
+            if (window.opener) {
+                window.opener.document.body.style.opacity = this.value;
+            }
+        });
+
+        // Add interaction enhancements
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            toggle.addEventListener('mouseenter', () => {
+                toggle.style.transform = 'scale(1.05)';
+            });
+            
+            toggle.addEventListener('mouseleave', () => {
+                toggle.style.transform = '';
+            });
+        });
+
+        // Initialize everything
+        loadSettings();
+        setupHotkeyInput('toggleHotkey');
+        setupHotkeyInput('timerHotkey');
+
+        // Keyboard shortcuts for settings
+        document.addEventListener('keydown', (e) => {
+            if (e.metaKey || e.ctrlKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        saveSettings();
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        resetDefaults();
+                        break;
+                    case 'w':
+                        e.preventDefault();
+                        closeSettings();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

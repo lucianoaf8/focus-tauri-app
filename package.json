@@ -1,0 +1,17 @@
+{
+    "name": "focus-task-manager",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "tauri": "tauri",
+        "build": "tauri build",
+        "dev": "tauri dev",
+        "prepare-dist": "node -e \"const fs = require('fs'); fs.existsSync('dist') || fs.mkdirSync('dist', { recursive: true })\""
+    },
+    "devDependencies": {
+        "@tauri-apps/cli": "^2.5.0",
+        "sharp": "^0.34.2",
+        "to-ico": "^1.1.5"
+    }
+}
