@@ -1,17 +1,54 @@
 {
     "name": "focus-task-manager",
-    "private": true,
     "version": "1.0.0",
-    "type": "module",
+    "description": "A focus task manager built with Electron",
+    "main": "src/main.js",
     "scripts": {
-        "tauri": "tauri",
-        "build": "tauri build",
-        "dev": "tauri dev",
-        "prepare-dist": "node -e \"const fs = require('fs'); fs.existsSync('dist') || fs.mkdirSync('dist', { recursive: true })\""
+        "start": "electron .",
+        "dev": "electron . --dev",
+        "build": "electron-builder",
+        "build:win": "electron-builder --win",
+        "build:mac": "electron-builder --mac",
+        "build:linux": "electron-builder --linux",
+        "pack": "electron-builder --dir",
+        "dist": "electron-builder"
     },
+    "keywords": [
+        "task",
+        "manager",
+        "productivity",
+        "electron"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
     "devDependencies": {
-        "@tauri-apps/cli": "^2.5.0",
-        "sharp": "^0.34.2",
-        "to-ico": "^1.1.5"
+        "electron": "^28.1.4",
+        "electron-builder": "^24.9.1",
+        "electron-reload": "^2.0.0-alpha.1"
+    },
+    "build": {
+        "appId": "com.focus.taskmanager",
+        "productName": "Focus Task Manager",
+        "directories": {
+            "output": "release"
+        },
+        "files": [
+            "dist/**/*",
+            "src/main.js",
+            "src/preload.js",
+            "package.json"
+        ],
+        "win": {
+            "target": "nsis",
+            "icon": "assets/icon.ico"
+        },
+        "mac": {
+            "target": "dmg",
+            "icon": "assets/icon.icns"
+        },
+        "linux": {
+            "target": "AppImage",
+            "icon": "assets/icon.png"
+        }
     }
 }

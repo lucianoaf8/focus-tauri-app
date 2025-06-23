@@ -76,6 +76,43 @@
             position: relative;
             overflow: hidden;
             animation: slideIn 0.6s ease-out;
+            -webkit-app-region: drag;  /* Make settings draggable */
+        }
+
+        .window-controls {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 8px;
+            -webkit-app-region: no-drag;
+            z-index: 1000;
+        }
+
+        .window-control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .window-control-btn.close {
+            background: #ff5f57;
+        }
+
+        .window-control-btn.minimize {
+            background: #ffbd2e;
+        }
+
+        .window-control-btn.maximize {
+            background: #28ca42;
+        }
+
+        .window-control-btn:hover {
+            transform: scale(1.1);
+            opacity: 0.8;
         }
 
         .settings-container::before {
@@ -171,6 +208,7 @@
             outline: none;
             position: relative;
             font-weight: 500;
+            -webkit-app-region: no-drag;  /* Prevent drag on inputs */
         }
 
         .setting-control::before {
@@ -208,6 +246,7 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(12px);
             overflow: hidden;
+            -webkit-app-region: no-drag;  /* Prevent drag on toggles */
         }
 
         .toggle-switch::before {
@@ -328,6 +367,7 @@
             outline: none;
             transition: all 0.3s ease;
             border: 1px solid rgba(244, 244, 245, 0.08);
+            -webkit-app-region: no-drag;  /* Prevent drag on range inputs */
         }
 
         .range-input::-webkit-slider-thumb {
@@ -378,6 +418,7 @@
             position: relative;
             overflow: hidden;
             font-family: inherit;
+            -webkit-app-region: no-drag;  /* Prevent drag on buttons */
         }
 
         .btn::before {
@@ -452,6 +493,7 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(12px);
             font-weight: 500;
+            -webkit-app-region: no-drag;  /* Prevent drag on hotkey inputs */
         }
 
         .hotkey-input:focus {
@@ -496,6 +538,13 @@
 </head>
 <body>
     <div class="settings-container">
+        <!-- Window Controls -->
+        <div class="window-controls">
+            <button class="window-control-btn close" onclick="closeSettings()" title="Close"></button>
+            <button class="window-control-btn minimize" onclick="minimizeSettingsWindow()" title="Minimize"></button>
+            <button class="window-control-btn maximize" onclick="maximizeSettingsWindow()" title="Maximize"></button>
+        </div>
+        
         <div class="settings-header">Settings</div>
 
         <div class="setting-group">
@@ -562,7 +611,7 @@
                     <div class="setting-name">Toggle Visibility</div>
                     <div class="setting-description">Global hotkey to show/hide window</div>
                 </div>
-                <input type="text" class="hotkey-input" id="toggleHotkey" value="⌘⇧T" readonly placeholder="Click to set">
+                <input type="text" class="hotkey-input" id="toggleHotkey" value="Ctrl+Shift+T" readonly placeholder="Click to set">
             </div>
 
             <div class="setting-row">
@@ -570,7 +619,7 @@
                     <div class="setting-name">Start/Pause Timer</div>
                     <div class="setting-description">Quick timer control</div>
                 </div>
-                <input type="text" class="hotkey-input" id="timerHotkey" value="⌘Space" readonly placeholder="Click to set">
+                <input type="text" class="hotkey-input" id="timerHotkey" value="Ctrl+Space" readonly placeholder="Click to set">
             </div>
         </div>
 
@@ -590,8 +639,8 @@
             defaultTimer: 25,
             soundNotifications: true,
             autoSaveNotes: true,
-            toggleHotkey: '⌘⇧T',
-            timerHotkey: '⌘Space'
+            toggleHotkey: 'Ctrl+Shift+T',
+            timerHotkey: 'Ctrl+Space'
         };
 
         // Load and apply settings
@@ -627,7 +676,7 @@
             }, 150);
         }
 
-        function saveSettings() {
+        async function saveSettings() {
             // Collect all current values
             settings.opacity = parseFloat(document.getElementById('opacity').value);
             settings.defaultTimer = parseInt(document.getElementById('defaultTimer').value);
@@ -637,10 +686,16 @@
             // Save to localStorage
             localStorage.setItem('taskManagerSettings', JSON.stringify(settings));
 
-            // Send to main process if in Electron
-            if (window.require) {
-                const { ipcRenderer } = window.require('electron');
-                ipcRenderer.send('save-settings', settings);
+            // Send to main process via Electron API
+            try {
+                if (typeof window.electronAPI !== 'undefined') {
+                    await window.electronAPI.saveSettings(settings);
+                    console.log('Settings saved via Electron API');
+                } else {
+                    console.log('Electron API not available, settings saved to localStorage only');
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
             }
 
             applySettings();
@@ -648,10 +703,8 @@
         }
 
         function applySettings() {
-            if (window.require) {
-                const { ipcRenderer } = window.require('electron');
-                ipcRenderer.send('apply-settings', settings);
-            } else if (window.opener) {
+            // Apply settings immediately if possible
+            if (window.opener) {
                 window.opener.postMessage({ type: 'settings-updated', settings }, '*');
             }
         }
@@ -664,8 +717,8 @@
                 defaultTimer: 25,
                 soundNotifications: true,
                 autoSaveNotes: true,
-                toggleHotkey: '⌘⇧T',
-                timerHotkey: '⌘Space'
+                toggleHotkey: 'Ctrl+Shift+T',
+                timerHotkey: 'Ctrl+Space'
             };
             updateUI();
             
@@ -678,12 +731,37 @@
             });
         }
 
-        function closeSettings() {
-            if (window.require) {
-                const { remote } = window.require('electron');
-                remote.getCurrentWindow().close();
-            } else {
+        async function closeSettings() {
+            try {
+                if (typeof window.electronAPI !== 'undefined') {
+                    await window.electronAPI.closeSettings();
+                } else {
+                    window.close();
+                }
+            } catch (error) {
+                console.error('Error closing settings:', error);
                 window.close();
+            }
+        }
+
+        // Window control functions for settings
+        async function minimizeSettingsWindow() {
+            try {
+                if (typeof window.electronAPI !== 'undefined') {
+                    await window.electronAPI.minimizeWindow();
+                }
+            } catch (error) {
+                console.error('Error minimizing settings window:', error);
+            }
+        }
+
+        async function maximizeSettingsWindow() {
+            try {
+                if (typeof window.electronAPI !== 'undefined') {
+                    await window.electronAPI.maximizeWindow();
+                }
+            } catch (error) {
+                console.error('Error maximizing settings window:', error);
             }
         }
 
@@ -701,28 +779,28 @@
                 e.preventDefault();
                 const keys = [];
                 
-                if (e.metaKey) keys.push('⌘');
-                if (e.ctrlKey) keys.push('⌃');
-                if (e.shiftKey) keys.push('⇧');
-                if (e.altKey) keys.push('⌥');
+                if (e.ctrlKey) keys.push('Ctrl');
+                if (e.metaKey) keys.push('Cmd');
+                if (e.shiftKey) keys.push('Shift');
+                if (e.altKey) keys.push('Alt');
                 
-                if (e.key && !['Meta', 'Control', 'Shift', 'Alt'].includes(e.key)) {
+                if (e.key && !['Control', 'Meta', 'Shift', 'Alt'].includes(e.key)) {
                     const keyMap = {
                         ' ': 'Space',
-                        'ArrowUp': '↑',
-                        'ArrowDown': '↓',
-                        'ArrowLeft': '←',
-                        'ArrowRight': '→',
-                        'Enter': '↵',
-                        'Escape': '⎋',
-                        'Tab': '⇥',
-                        'Backspace': '⌫'
+                        'ArrowUp': 'Up',
+                        'ArrowDown': 'Down',
+                        'ArrowLeft': 'Left',
+                        'ArrowRight': 'Right',
+                        'Enter': 'Enter',
+                        'Escape': 'Esc',
+                        'Tab': 'Tab',
+                        'Backspace': 'Backspace'
                     };
                     keys.push(keyMap[e.key] || e.key.toUpperCase());
                 }
                 
                 if (keys.length > 1) {
-                    this.value = keys.join('');
+                    this.value = keys.join('+');
                     settings[inputId] = this.value;
                     this.style.background = '';
                     this.blur();
@@ -765,7 +843,7 @@
 
         // Keyboard shortcuts for settings
         document.addEventListener('keydown', (e) => {
-            if (e.metaKey || e.ctrlKey) {
+            if (e.ctrlKey || e.metaKey) {
                 switch(e.key) {
                     case 's':
                         e.preventDefault();
@@ -780,6 +858,18 @@
                         closeSettings();
                         break;
                 }
+            }
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Settings DOM loaded');
+            
+            // Check Electron availability
+            if (typeof window.electronAPI !== 'undefined') {
+                console.log('Electron APIs available in settings');
+            } else {
+                console.log('Electron APIs not available - running in browser mode');
             }
         });
     </script>

@@ -12,7 +12,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
             background: 
@@ -74,9 +73,9 @@
             background: rgba(9, 9, 11, 0.4);
         }
 
-        /* Header */
+        /* Header with window controls */
         .header {
-            padding: 20px 18px 16px;
+            padding: 8px 18px 16px;    /* Reduced top padding for window controls */
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -87,6 +86,42 @@
             backdrop-filter: blur(16px);
             position: relative;
             overflow: hidden;
+            -webkit-app-region: drag;   /* Make header draggable */
+        }
+
+        .window-controls {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 8px;
+            -webkit-app-region: no-drag;  /* Prevent drag on buttons */
+        }
+
+        .window-control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .window-control-btn.close {
+            background: #ff5f57;
+        }
+
+        .window-control-btn.minimize {
+            background: #ffbd2e;
+        }
+
+        .window-control-btn.maximize {
+            background: #28ca42;
+        }
+
+        .window-control-btn:hover {
+            transform: scale(1.1);
+            opacity: 0.8;
         }
 
         .header::before {
@@ -102,6 +137,7 @@
         .header-content {
             flex: 1;
             text-align: center;
+            margin-top: 12px;  /* Add space for window controls */
         }
 
         .header h1 {
@@ -126,8 +162,8 @@
         }
 
         .settings-icon {
-            width: 20px;
-            height: 20px;
+            width: 36px;  /* Made larger */
+            height: 36px; /* Made larger */
             cursor: pointer;
             opacity: 0.7;
             transition: all 0.3s ease;
@@ -138,6 +174,11 @@
             backdrop-filter: blur(12px);
             position: relative;
             overflow: hidden;
+            display: flex; /* Ensure proper centering */
+            align-items: center;
+            justify-content: center;
+            -webkit-app-region: no-drag;  /* Prevent drag on settings icon */
+            margin-top: 12px;  /* Align with header content */
         }
 
         .settings-icon::before {
@@ -163,18 +204,19 @@
         }
 
         .settings-icon svg {
-            width: 100%;
-            height: 100%;
+            width: 20px;  /* Explicit size for SVG */
+            height: 20px; /* Explicit size for SVG */
             fill: #f4f4f5;
+            pointer-events: none; /* Prevent SVG from interfering with clicks */
         }
 
-        /* Tasks Section */
+        /* Tasks Section - Made bigger */
         .tasks-section {
-            flex: 1;
-            padding: 16px 14px;
+            flex: 2;            /* Increased from 1 to give more space */
+            padding: 20px 14px; /* Increased padding */
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;          /* Increased gap between tasks */
             overflow-y: auto;
             scroll-behavior: smooth;
         }
@@ -785,92 +827,68 @@
                 }
             }
         });
+
+        // Electron-specific settings function
         async function openSettings() {
-        console.log('Opening settings...');
-        
-        try {
-            // Check if Tauri is available
-            if (typeof window.__TAURI__ !== 'undefined' && window.__TAURI__.window) {
-                console.log('Tauri detected, creating native window');
-                
-                const { WebviewWindow } = window.__TAURI__.window;
-                
-                // Check if settings window already exists
-                try {
-                    const existingWindow = WebviewWindow.getByLabel('settings');
-                    if (existingWindow) {
-                        console.log('Settings window exists, focusing...');
-                        await existingWindow.setFocus();
-                        return;
-                    }
-                } catch (e) {
-                    console.log('No existing settings window found');
-                }
-                
-                // Create new settings window
-                console.log('Creating new settings window...');
-                const settingsWindow = new WebviewWindow('settings', {
-                    url: 'settings.html',
-                    title: 'Settings',
-                    width: 600,
-                    height: 700,
-                    minWidth: 500,
-                    minHeight: 600,
-                    resizable: true,
-                    center: true,
-                    decorations: true,
-                    alwaysOnTop: true
-                });
-                
-                // Handle window events
-                settingsWindow.once('tauri://created', () => {
-                    console.log('Settings window created successfully');
-                });
-                
-                settingsWindow.once('tauri://error', (e) => {
-                    console.error('Settings window creation error:', e);
+            console.log('Settings icon clicked - Opening settings...');
+            
+            try {
+                // Check if Electron API is available
+                if (typeof window.electronAPI !== 'undefined') {
+                    console.log('Electron API detected, opening settings window');
+                    await window.electronAPI.openSettings();
+                } else {
+                    console.log('Electron API not available, using fallback');
                     fallbackOpenSettings();
-                });
-                
-            } else {
-                console.log('Tauri not available, using fallback');
+                }
+            } catch (error) {
+                console.error('Error opening settings:', error);
                 fallbackOpenSettings();
             }
-        } catch (error) {
-            console.error('Error in openSettings:', error);
-            fallbackOpenSettings();
         }
-    }
 
-    function fallbackOpenSettings() {
-        console.log('Using browser fallback for settings');
-        const settingsWindow = window.open(
-            'settings.html',
-            'settings',
-            'width=600,height=700,scrollbars=no,resizable=yes,location=no,toolbar=no,menubar=no,status=no'
-        );
-        
-        if (settingsWindow) {
-            settingsWindow.focus();
-        } else {
-            console.error('Failed to open settings window');
+        function fallbackOpenSettings() {
+            console.log('Using browser fallback for settings');
+            const settingsWindow = window.open(
+                'settings.html',
+                'settings',
+                'width=600,height=700,scrollbars=no,resizable=yes,location=no,toolbar=no,menubar=no,status=no'
+            );
+            
+            if (settingsWindow) {
+                settingsWindow.focus();
+            } else {
+                console.error('Failed to open settings window');
+            }
         }
-    }
 
-    // Add this to your initialization code (in the existing script section)
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOM loaded');
-        
-        // Check Tauri availability
-        if (typeof window.__TAURI__ !== 'undefined') {
-            console.log('Tauri APIs available:', Object.keys(window.__TAURI__));
-        } else {
-            console.log('Tauri APIs not available - running in browser mode');
-        }
-        
-        // Rest of your existing initialization code...
-        updateDisplay();
-    });
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded');
+            
+            // Check Electron availability
+            if (typeof window.electronAPI !== 'undefined') {
+                console.log('Electron APIs available');
+            } else {
+                console.log('Electron APIs not available - running in browser mode');
+            }
+            
+            // Check if settings icon SVG loaded properly
+            const settingsIcon = document.querySelector('.settings-icon svg');
+            const fallbackIcon = document.querySelector('.settings-icon span');
+            
+            if (settingsIcon) {
+                settingsIcon.addEventListener('error', () => {
+                    console.log('SVG failed to load, showing fallback');
+                    settingsIcon.style.display = 'none';
+                    if (fallbackIcon) {
+                        fallbackIcon.style.display = 'block';
+                    }
+                });
+            }
+            
+            updateDisplay();
+        });
     </script>
 </body>
 </html>

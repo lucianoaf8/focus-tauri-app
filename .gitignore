@@ -1,9 +1,7 @@
-# Tauri Build Artifacts
-/src-tauri/target/
-/src-tauri/gen/
-/src-tauri/WixTools/
-/target/
-/gen/
+# Electron Build Artifacts
+/release/
+/build/
+/out/
 
 # Node.js Dependencies
 node_modules/
@@ -13,7 +11,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Package Manager Lock Files (keep package.json, exclude locks)
+# Package Manager Lock Files
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
@@ -40,16 +38,6 @@ lib-cov/
 .env
 .env.*
 !.env.example
-
-# Rust Build Artifacts
-target/
-Cargo.lock
-**/*.rs.bk
-*.pdb
-
-# Rust Cache
-.cargo/
-.rustup/
 
 # OS Generated Files
 # Windows
@@ -241,16 +229,6 @@ htmlcov/
 .pytest_cache/
 .ruff_cache/
 
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
 # Database Files
 *.db
 *.sqlite
@@ -324,26 +302,18 @@ docs/build/
 docs/_build/
 site/
 
-# Tauri specific bundle outputs
-src-tauri/target/release/bundle/
-src-tauri/target/debug/bundle/
+# Electron specific outputs
+*.dmg
+*.exe
+*.rpm
+*.deb
+*.tar.gz
+*.AppImage
+*.snap
 
-# Windows specific Tauri files
-src-tauri/target/**/deps/
-src-tauri/target/**/build/
-src-tauri/target/**/incremental/
-src-tauri/target/.rustc_info.json
-src-tauri/target/CACHEDIR.TAG
-
-# Any custom generated files
-generated/
-auto-generated/
-.generated/
-
-# Local environment and development files
-.local/
-.dev/
-dev-only/
+# Electron builder outputs
+dist_electron/
+build/
 
 # Security and sensitive files
 *.key
@@ -360,4 +330,3 @@ ehthumbs_vista.db
 *.lnk
 
 /.claude/
-/-p/
