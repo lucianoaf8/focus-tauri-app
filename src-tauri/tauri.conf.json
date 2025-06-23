@@ -10,16 +10,24 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "Focus Task Manager",
-        "width": 800,
-        "height": 600,
+        "width": 400,
+        "height": 700,
+        "minWidth": 350,
+        "minHeight": 600,
+        "maxWidth": 450,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "alwaysOnTop": false,
+        "center": true,
+        "decorations": true
       }
     ],
     "security": {
       "csp": null
-    }
+    },
+    "withGlobalTauri": true
   },
   "bundle": {
     "active": true,

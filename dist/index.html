@@ -21,8 +21,6 @@
                 linear-gradient(145deg, #09090b 0%, #18181b 30%, #0f0f0f 70%, #09090b 100%);
             color: #f4f4f5;
             height: 100vh;
-            min-width: 320px;
-            max-width: 400px;
             width: 100vw;
             margin: 0 auto;
             overflow: hidden;
@@ -30,7 +28,6 @@
             --primary-glow: rgba(161, 161, 170, 0.15);
             --secondary-glow: rgba(113, 113, 122, 0.1);
         }
-
         body::before {
             content: '';
             position: absolute;
@@ -788,33 +785,92 @@
                 }
             }
         });
-        function openSettings() {
-            if (window.__TAURI__) {
-                // In Tauri app - create new window
-                window.__TAURI__.window.WebviewWindow.getByLabel('settings') || 
-                new window.__TAURI__.window.WebviewWindow('settings', {
+        async function openSettings() {
+        console.log('Opening settings...');
+        
+        try {
+            // Check if Tauri is available
+            if (typeof window.__TAURI__ !== 'undefined' && window.__TAURI__.window) {
+                console.log('Tauri detected, creating native window');
+                
+                const { WebviewWindow } = window.__TAURI__.window;
+                
+                // Check if settings window already exists
+                try {
+                    const existingWindow = WebviewWindow.getByLabel('settings');
+                    if (existingWindow) {
+                        console.log('Settings window exists, focusing...');
+                        await existingWindow.setFocus();
+                        return;
+                    }
+                } catch (e) {
+                    console.log('No existing settings window found');
+                }
+                
+                // Create new settings window
+                console.log('Creating new settings window...');
+                const settingsWindow = new WebviewWindow('settings', {
                     url: 'settings.html',
                     title: 'Settings',
                     width: 600,
                     height: 700,
-                    resizable: false,
+                    minWidth: 500,
+                    minHeight: 600,
+                    resizable: true,
                     center: true,
                     decorations: true,
                     alwaysOnTop: true
                 });
-            } else {
-                // In browser - open popup window
-                const settingsWindow = window.open(
-                    'settings.html',
-                    'settings',
-                    'width=600,height=700,scrollbars=no,resizable=no,location=no,toolbar=no,menubar=no,status=no'
-                );
                 
-                if (settingsWindow) {
-                    settingsWindow.focus();
-                }
+                // Handle window events
+                settingsWindow.once('tauri://created', () => {
+                    console.log('Settings window created successfully');
+                });
+                
+                settingsWindow.once('tauri://error', (e) => {
+                    console.error('Settings window creation error:', e);
+                    fallbackOpenSettings();
+                });
+                
+            } else {
+                console.log('Tauri not available, using fallback');
+                fallbackOpenSettings();
             }
+        } catch (error) {
+            console.error('Error in openSettings:', error);
+            fallbackOpenSettings();
         }
+    }
+
+    function fallbackOpenSettings() {
+        console.log('Using browser fallback for settings');
+        const settingsWindow = window.open(
+            'settings.html',
+            'settings',
+            'width=600,height=700,scrollbars=no,resizable=yes,location=no,toolbar=no,menubar=no,status=no'
+        );
+        
+        if (settingsWindow) {
+            settingsWindow.focus();
+        } else {
+            console.error('Failed to open settings window');
+        }
+    }
+
+    // Add this to your initialization code (in the existing script section)
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded');
+        
+        // Check Tauri availability
+        if (typeof window.__TAURI__ !== 'undefined') {
+            console.log('Tauri APIs available:', Object.keys(window.__TAURI__));
+        } else {
+            console.log('Tauri APIs not available - running in browser mode');
+        }
+        
+        // Rest of your existing initialization code...
+        updateDisplay();
+    });
     </script>
 </body>
 </html>
