@@ -15,35 +15,10 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(24, 24, 27, 0.8) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(39, 39, 42, 0.8) 0%, transparent 50%),
-                linear-gradient(145deg, #09090b 0%, #18181b 30%, #0f0f0f 70%, #09090b 100%);
+            background: #09090b;
             color: #f4f4f5;
             height: 100vh;
             overflow: hidden;
-            position: relative;
-            --primary-glow: rgba(161, 161, 170, 0.15);
-            --secondary-glow: rgba(113, 113, 122, 0.1);
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                conic-gradient(from 180deg at 50% 50%, rgba(82, 82, 91, 0.05) 0deg, rgba(161, 161, 170, 0.1) 180deg, rgba(82, 82, 91, 0.05) 360deg),
-                linear-gradient(45deg, transparent 30%, rgba(244, 244, 245, 0.02) 50%, transparent 70%);
-            pointer-events: none;
-            animation: shimmer 20s linear infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(360deg); }
         }
 
         @keyframes slideIn {
@@ -57,26 +32,17 @@
             }
         }
 
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(161, 161, 170, 0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(161, 161, 170, 0); }
-        }
-
         .settings-container {
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.04) 100%),
-                linear-gradient(45deg, transparent, rgba(161, 161, 170, 0.05), transparent);
-            border: 1px solid rgba(244, 244, 245, 0.08);
-            border-radius: 16px;
-            padding: 28px;
-            backdrop-filter: blur(24px) saturate(180%);
+            background: #18181b;
             height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
+            padding: 28px;
             animation: slideIn 0.6s ease-out;
-            -webkit-app-region: drag;  /* Make settings draggable */
+            /* drag disabled to allow scrolling */
+            -webkit-app-region: no-drag;
         }
 
         .window-controls {
@@ -90,57 +56,33 @@
         }
 
         .window-control-btn {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: none;
+            width: 24px;
+            height: 24px;
+            border: 1px solid rgba(244, 244, 245, 0.15);
+            border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s ease;
+            background: rgba(244, 244, 245, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f4f4f5;
+            font-size: 16px;
+            font-weight: bold;
         }
 
-        .window-control-btn.close {
+        .window-control-btn.close:hover {
             background: #ff5f57;
+            border-color: #ff5f57;
         }
 
-        .window-control-btn.minimize {
-            background: #ffbd2e;
-        }
-
-        .window-control-btn.maximize {
-            background: #28ca42;
+        .window-control-btn.minimize:hover {
+            background: rgba(244, 244, 245, 0.15);
+            border-color: rgba(244, 244, 245, 0.25);
         }
 
         .window-control-btn:hover {
-            transform: scale(1.1);
-            opacity: 0.8;
-        }
-
-        .settings-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.3), transparent);
-            border-radius: 16px 16px 0 0;
-        }
-
-        .settings-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.05), transparent);
-            animation: sweep 3s ease-in-out infinite;
-        }
-
-        @keyframes sweep {
-            0% { left: -100%; }
-            50% { left: 100%; }
-            100% { left: 100%; }
+            transform: scale(1.05);
         }
 
         .settings-header {
@@ -148,31 +90,16 @@
             font-weight: 600;
             color: #f4f4f5;
             margin-bottom: 28px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-            border-bottom: 1px solid rgba(244, 244, 245, 0.08);
             padding-bottom: 16px;
+            border-bottom: 1px solid rgba(244, 244, 245, 0.08);
             letter-spacing: -0.025em;
-            background: linear-gradient(135deg, #f4f4f5 0%, #d4d4d8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-        }
-
-        .settings-header::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 60px;
-            height: 2px;
-            background: linear-gradient(90deg, rgba(244, 244, 245, 0.6), transparent);
-            border-radius: 1px;
+            -webkit-app-region: drag;
         }
 
         .setting-group {
             margin-bottom: 28px;
             animation: slideIn 0.6s ease-out backwards;
+            flex-shrink: 0;
         }
 
         .setting-group:nth-child(2) { animation-delay: 0.1s; }
@@ -186,16 +113,10 @@
             margin-bottom: 16px;
             text-transform: uppercase;
             letter-spacing: 0.075em;
-            background: linear-gradient(135deg, #f4f4f5 0%, #d4d4d8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .setting-control {
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.06) 0%, rgba(244, 244, 245, 0.02) 100%),
-                linear-gradient(45deg, transparent 30%, rgba(244, 244, 245, 0.02) 50%, transparent 70%);
+            background: rgba(244, 244, 245, 0.06);
             border: 1px solid rgba(244, 244, 245, 0.08);
             border-radius: 10px;
             padding: 12px 14px;
@@ -204,33 +125,15 @@
             font-size: 13px;
             width: 100%;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(16px);
             outline: none;
-            position: relative;
             font-weight: 500;
-            -webkit-app-region: no-drag;  /* Prevent drag on inputs */
-        }
-
-        .setting-control::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.2), transparent);
-            border-radius: 10px 10px 0 0;
+            -webkit-app-region: no-drag;
         }
 
         .setting-control:focus {
             border-color: rgba(244, 244, 245, 0.2);
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.04) 100%),
-                linear-gradient(45deg, transparent 30%, rgba(244, 244, 245, 0.04) 50%, transparent 70%);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.3),
-                0 4px 16px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(244, 244, 245, 0.15);
+            background: rgba(244, 244, 245, 0.1);
+            box-shadow: 0 0 0 2px rgba(244, 244, 245, 0.1);
             transform: translateY(-1px);
         }
 
@@ -238,26 +141,14 @@
             position: relative;
             width: 52px;
             height: 28px;
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.08) 0%, rgba(244, 244, 245, 0.04) 100%);
+            background: rgba(244, 244, 245, 0.08);
             border: 1px solid rgba(244, 244, 245, 0.15);
             border-radius: 14px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(12px);
             overflow: hidden;
-            -webkit-app-region: no-drag;  /* Prevent drag on toggles */
-        }
-
-        .toggle-switch::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.3), transparent);
-            border-radius: 14px 14px 0 0;
+            flex-shrink: 0;
+            -webkit-app-region: no-drag;
         }
 
         .toggle-switch::after {
@@ -267,32 +158,28 @@
             left: 3px;
             width: 20px;
             height: 20px;
-            background: 
-                linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%);
+            background: #f4f4f5;
             border-radius: 50%;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-                0 4px 12px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
 
         .toggle-switch.active {
-            background: linear-gradient(135deg, #71717a 0%, #52525b 100%);
+            background: #71717a;
             border-color: #71717a;
-            box-shadow: 
-                0 4px 16px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(244, 244, 245, 0.2);
         }
 
         .toggle-switch.active::after {
             transform: translateX(24px);
-            background: linear-gradient(135deg, #ffffff 0%, #f4f4f5 100%);
+            background: #ffffff;
         }
 
         .toggle-switch:hover {
             transform: scale(1.05);
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.12) 0%, rgba(244, 244, 245, 0.06) 100%);
+            background: rgba(244, 244, 245, 0.12);
+        }
+
+        .toggle-switch.active:hover {
+            background: #787887;
         }
 
         .setting-row {
@@ -302,7 +189,7 @@
             margin-bottom: 20px;
             padding: 16px 0;
             border-bottom: 1px solid rgba(244, 244, 245, 0.04);
-            position: relative;
+            gap: 16px;
         }
 
         .setting-row:last-child {
@@ -312,6 +199,7 @@
 
         .setting-info {
             flex: 1;
+            min-width: 0;
         }
 
         .setting-name {
@@ -339,7 +227,7 @@
             padding: 0;
             overflow: hidden;
             transition: all 0.3s ease;
-            backdrop-filter: blur(8px);
+            flex-shrink: 0;
         }
 
         .color-picker::-webkit-color-swatch-wrapper {
@@ -359,15 +247,15 @@
 
         .range-input {
             -webkit-appearance: none;
-            width: 100%;
+            width: 120px;
             height: 6px;
             border-radius: 3px;
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.05) 100%);
+            background: rgba(244, 244, 245, 0.1);
             outline: none;
             transition: all 0.3s ease;
             border: 1px solid rgba(244, 244, 245, 0.08);
-            -webkit-app-region: no-drag;  /* Prevent drag on range inputs */
+            flex-shrink: 0;
+            -webkit-app-region: no-drag;
         }
 
         .range-input::-webkit-slider-thumb {
@@ -376,20 +264,14 @@
             width: 18px;
             height: 18px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%);
+            background: #f4f4f5;
             cursor: pointer;
             border: 2px solid rgba(244, 244, 245, 0.2);
-            box-shadow: 
-                0 4px 12px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
             transition: all 0.3s ease;
         }
 
         .range-input::-webkit-slider-thumb:hover {
             transform: scale(1.2);
-            box-shadow: 
-                0 6px 16px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5);
         }
 
         .buttons {
@@ -400,6 +282,7 @@
             padding-top: 24px;
             border-top: 1px solid rgba(244, 244, 245, 0.08);
             animation: slideIn 0.6s ease-out 0.4s backwards;
+            flex-shrink: 0;
         }
 
         .btn {
@@ -410,52 +293,17 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(16px);
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.05) 100%);
+            background: rgba(244, 244, 245, 0.1);
             color: #f4f4f5;
             letter-spacing: 0.025em;
-            position: relative;
-            overflow: hidden;
             font-family: inherit;
-            -webkit-app-region: no-drag;  /* Prevent drag on buttons */
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.4), transparent);
-            border-radius: 10px 10px 0 0;
-        }
-
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .btn:hover::after {
-            left: 100%;
+            -webkit-app-region: no-drag;
         }
 
         .btn:hover {
             transform: translateY(-2px) scale(1.02);
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.15) 0%, rgba(244, 244, 245, 0.08) 100%);
+            background: rgba(244, 244, 245, 0.15);
             border-color: rgba(244, 244, 245, 0.25);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                0 4px 16px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(244, 244, 245, 0.25);
         }
 
         .btn:active {
@@ -463,25 +311,17 @@
         }
 
         .btn.primary {
-            background: linear-gradient(135deg, #71717a 0%, #52525b 100%);
+            background: #71717a;
             border-color: #71717a;
             color: #ffffff;
-            box-shadow: 
-                0 4px 16px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(244, 244, 245, 0.2);
         }
 
         .btn.primary:hover {
-            background: linear-gradient(135deg, #787887 0%, #5a5a65 100%);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                0 4px 16px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(244, 244, 245, 0.3);
+            background: #787887;
         }
 
         .hotkey-input {
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.06) 0%, rgba(244, 244, 245, 0.02) 100%);
+            background: rgba(244, 244, 245, 0.06);
             border: 1px solid rgba(244, 244, 245, 0.08);
             border-radius: 8px;
             padding: 8px 12px;
@@ -491,41 +331,50 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            backdrop-filter: blur(12px);
             font-weight: 500;
-            -webkit-app-region: no-drag;  /* Prevent drag on hotkey inputs */
+            width: 140px;
+            flex-shrink: 0;
+            -webkit-app-region: no-drag;
         }
 
         .hotkey-input:focus {
             border-color: rgba(244, 244, 245, 0.2);
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.04) 100%);
-            box-shadow: 
-                0 4px 16px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(244, 244, 245, 0.15);
+            background: rgba(244, 244, 245, 0.1);
+            box-shadow: 0 0 0 2px rgba(244, 244, 245, 0.1);
         }
 
-        /* Scrollbar for content */
+        /* Improved scrollbar styling */
         .settings-container::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
 
         .settings-container::-webkit-scrollbar-track {
-            background: rgba(244, 244, 245, 0.02);
-            border-radius: 3px;
+            background: rgba(244, 244, 245, 0.05);
+            border-radius: 4px;
+            margin: 8px 0;
         }
 
         .settings-container::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, rgba(244, 244, 245, 0.3) 0%, rgba(244, 244, 245, 0.2) 100%);
-            border-radius: 3px;
+            background: rgba(244, 244, 245, 0.3);
+            border-radius: 4px;
             border: 1px solid rgba(244, 244, 245, 0.1);
         }
 
         .settings-container::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, rgba(244, 244, 245, 0.4) 0%, rgba(244, 244, 245, 0.3) 100%);
+            background: rgba(244, 244, 245, 0.4);
         }
 
-        @media (max-height: 600px) {
+        /* Ensure content doesn't get cut off */
+        .settings-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            padding-bottom: 20px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-height: 700px) {
             .settings-container {
                 padding: 20px;
             }
@@ -533,6 +382,15 @@
             .setting-group {
                 margin-bottom: 20px;
             }
+            
+            .settings-header {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Ensure number inputs work properly */
+        input[type="number"] {
+            width: 80px;
         }
     </style>
 </head>
@@ -540,93 +398,94 @@
     <div class="settings-container">
         <!-- Window Controls -->
         <div class="window-controls">
-            <button class="window-control-btn close" onclick="closeSettings()" title="Close"></button>
-            <button class="window-control-btn minimize" onclick="minimizeSettingsWindow()" title="Minimize"></button>
-            <button class="window-control-btn maximize" onclick="maximizeSettingsWindow()" title="Maximize"></button>
+            <button class="window-control-btn minimize" onclick="minimizeSettingsWindow()" title="Minimize">−</button>
+            <button class="window-control-btn close" onclick="closeSettings()" title="Close">×</button>
         </div>
         
-        <div class="settings-header">Settings</div>
+        <div class="settings-content">
+            <div class="settings-header">Settings</div>
 
-        <div class="setting-group">
-            <div class="setting-label">Appearance</div>
-            
-            <div class="setting-row">
-                <div class="setting-info">
-                    <div class="setting-name">Always on Top</div>
-                    <div class="setting-description">Keep window above other applications</div>
+            <div class="setting-group">
+                <div class="setting-label">Appearance</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Always on Top</div>
+                        <div class="setting-description">Keep window above other applications</div>
+                    </div>
+                    <div class="toggle-switch" id="alwaysOnTop" onclick="toggleSetting(this)"></div>
                 </div>
-                <div class="toggle-switch" id="alwaysOnTop" onclick="toggleSetting(this)"></div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Auto-hide</div>
+                        <div class="setting-description">Hide when not in use for 30 seconds</div>
+                    </div>
+                    <div class="toggle-switch" id="autoHide" onclick="toggleSetting(this)"></div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Window Opacity</div>
+                        <div class="setting-description">Adjust interface transparency</div>
+                    </div>
+                    <input type="range" class="range-input" id="opacity" min="0.3" max="1" step="0.1" value="0.9">
+                </div>
             </div>
 
-            <div class="setting-row">
-                <div class="setting-info">
-                    <div class="setting-name">Auto-hide</div>
-                    <div class="setting-description">Hide when not in use for 30 seconds</div>
+            <div class="setting-group">
+                <div class="setting-label">Behavior</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Default Timer</div>
+                        <div class="setting-description">Minutes for new timer sessions</div>
+                    </div>
+                    <input type="number" class="setting-control" id="defaultTimer" value="25" min="1" max="120" style="width: 80px;">
                 </div>
-                <div class="toggle-switch" id="autoHide" onclick="toggleSetting(this)"></div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Sound Notifications</div>
+                        <div class="setting-description">Play sound when timer completes</div>
+                    </div>
+                    <div class="toggle-switch active" id="soundNotifications" onclick="toggleSetting(this)"></div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Auto-save Notes</div>
+                        <div class="setting-description">Automatically save notes as you type</div>
+                    </div>
+                    <div class="toggle-switch active" id="autoSaveNotes" onclick="toggleSetting(this)"></div>
+                </div>
             </div>
 
-            <div class="setting-row">
-                <div class="setting-info">
-                    <div class="setting-name">Window Opacity</div>
-                    <div class="setting-description">Adjust interface transparency</div>
+            <div class="setting-group">
+                <div class="setting-label">Shortcuts</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Toggle Visibility</div>
+                        <div class="setting-description">Global hotkey to show/hide window</div>
+                    </div>
+                    <input type="text" class="hotkey-input" id="toggleHotkey" value="Ctrl+Shift+T" readonly placeholder="Click to set">
                 </div>
-                <input type="range" class="range-input" id="opacity" min="0.3" max="1" step="0.1" value="0.9">
-            </div>
-        </div>
 
-        <div class="setting-group">
-            <div class="setting-label">Behavior</div>
-            
-            <div class="setting-row">
-                <div class="setting-info">
-                    <div class="setting-name">Default Timer</div>
-                    <div class="setting-description">Minutes for new timer sessions</div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Start/Pause Timer</div>
+                        <div class="setting-description">Quick timer control</div>
+                    </div>
+                    <input type="text" class="hotkey-input" id="timerHotkey" value="Ctrl+Space" readonly placeholder="Click to set">
                 </div>
-                <input type="number" class="setting-control" id="defaultTimer" value="25" min="1" max="120" style="width: 80px;">
-            </div>
-
-            <div class="setting-row">
-                <div class="setting-info">
-                    <div class="setting-name">Sound Notifications</div>
-                    <div class="setting-description">Play sound when timer completes</div>
-                </div>
-                <div class="toggle-switch active" id="soundNotifications" onclick="toggleSetting(this)"></div>
             </div>
 
-            <div class="setting-row">
-                <div class="setting-info">
-                    <div class="setting-name">Auto-save Notes</div>
-                    <div class="setting-description">Automatically save notes as you type</div>
-                </div>
-                <div class="toggle-switch active" id="autoSaveNotes" onclick="toggleSetting(this)"></div>
+            <div class="buttons">
+                <button class="btn" onclick="resetDefaults()">Reset</button>
+                <button class="btn" onclick="closeSettings()">Cancel</button>
+                <button class="btn primary" onclick="saveSettings()">Save Changes</button>
             </div>
-        </div>
-
-        <div class="setting-group">
-            <div class="setting-label">Shortcuts</div>
-            
-            <div class="setting-row">
-                <div class="setting-info">
-                    <div class="setting-name">Toggle Visibility</div>
-                    <div class="setting-description">Global hotkey to show/hide window</div>
-                </div>
-                <input type="text" class="hotkey-input" id="toggleHotkey" value="Ctrl+Shift+T" readonly placeholder="Click to set">
-            </div>
-
-            <div class="setting-row">
-                <div class="setting-info">
-                    <div class="setting-name">Start/Pause Timer</div>
-                    <div class="setting-description">Quick timer control</div>
-                </div>
-                <input type="text" class="hotkey-input" id="timerHotkey" value="Ctrl+Space" readonly placeholder="Click to set">
-            </div>
-        </div>
-
-        <div class="buttons">
-            <button class="btn" onclick="resetDefaults()">Reset</button>
-            <button class="btn" onclick="closeSettings()">Cancel</button>
-            <button class="btn primary" onclick="saveSettings()">Save Changes</button>
         </div>
     </div>
 
@@ -771,7 +630,7 @@
             
             input.addEventListener('click', function() {
                 this.value = 'Press keys...';
-                this.style.background = 'linear-gradient(135deg, rgba(113, 113, 122, 0.2) 0%, rgba(82, 82, 91, 0.1) 100%)';
+                this.style.background = 'rgba(113, 113, 122, 0.2)';
                 this.focus();
             });
 

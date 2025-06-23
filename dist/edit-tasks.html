@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Tasks - Priority Task Manager</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(24, 24, 27, 0.8) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(39, 39, 42, 0.8) 0%, transparent 50%),
+                linear-gradient(145deg, #09090b 0%, #18181b 30%, #0f0f0f 70%, #09090b 100%);
+            color: #f4f4f5;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                conic-gradient(from 180deg at 50% 50%, rgba(82, 82, 91, 0.05) 0deg, rgba(161, 161, 170, 0.1) 180deg, rgba(82, 82, 91, 0.05) 360deg),
+                linear-gradient(45deg, transparent 30%, rgba(244, 244, 245, 0.02) 50%, transparent 70%);
+            pointer-events: none;
+            animation: shimmer 20s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(10px) scale(0.98); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(24px) saturate(180%);
+            position: relative;
+            z-index: 1;
+            background: rgba(9, 9, 11, 0.4);
+        }
+
+        /* Header */
+        .header {
+            padding: 8px 18px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.12) 0%, rgba(244, 244, 245, 0.04) 100%),
+                linear-gradient(45deg, transparent, rgba(161, 161, 170, 0.05), transparent);
+            border-bottom: 1px solid rgba(244, 244, 245, 0.08);
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+            -webkit-app-region: drag;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.3), transparent);
+        }
+
+        .back-button {
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(244, 244, 245, 0.08) 0%, rgba(244, 244, 245, 0.02) 100%);
+            border: 1px solid rgba(244, 244, 245, 0.06);
+            backdrop-filter: blur(12px);
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-app-region: no-drag;
+        }
+
+        .back-button:hover {
+            opacity: 1;
+            transform: scale(1.1);
+            background: linear-gradient(135deg, rgba(244, 244, 245, 0.12) 0%, rgba(244, 244, 245, 0.06) 100%);
+            border-color: rgba(244, 244, 245, 0.15);
+        }
+
+        .back-button svg {
+            width: 20px;
+            height: 20px;
+            fill: #f4f4f5;
+        }
+
+        .header-content {
+            flex: 1;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .header h1 {
+            font-size: 19px;
+            font-weight: 600;
+            color: #f4f4f5;
+            margin-bottom: 6px;
+            letter-spacing: -0.025em;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            background: linear-gradient(135deg, #f4f4f5 0%, #d4d4d8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            font-size: 11px;
+            color: rgba(244, 244, 245, 0.6);
+            font-weight: 500;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+        }
+
+        .window-controls {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 8px;
+            -webkit-app-region: no-drag;
+        }
+
+        .window-control-btn {
+            width: 24px;
+            height: 24px;
+            border: 1px solid rgba(244, 244, 245, 0.15);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: linear-gradient(135deg, rgba(244, 244, 245, 0.08) 0%, rgba(244, 244, 245, 0.02) 100%);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f4f4f5;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .window-control-btn.close:hover {
+            background: #ff5f57;
+            border-color: #ff5f57;
+        }
+
+        .window-control-btn.minimize:hover {
+            background: rgba(244, 244, 245, 0.15);
+            border-color: rgba(244, 244, 245, 0.25);
+        }
+
+        /* Edit Form */
+        .edit-form {
+            flex: 1;
+            padding: 20px 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .task-editor {
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.08) 0%, rgba(244, 244, 245, 0.02) 100%),
+                linear-gradient(45deg, transparent 30%, rgba(244, 244, 245, 0.02) 50%, transparent 70%);
+            border: 1px solid rgba(244, 244, 245, 0.06);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            backdrop-filter: blur(16px);
+            animation: slideIn 0.6s ease-out backwards;
+        }
+
+        .task-editor:nth-child(1) { animation-delay: 0.1s; }
+        .task-editor:nth-child(2) { animation-delay: 0.2s; }
+        .task-editor:nth-child(3) { animation-delay: 0.3s; }
+        .task-editor:nth-child(4) { animation-delay: 0.4s; }
+        .task-editor:nth-child(5) { animation-delay: 0.5s; }
+
+        .task-editor.priority-1 {
+            border-left: 3px solid #dc2626;
+            box-shadow: -2px 0 12px rgba(220, 38, 38, 0.15);
+        }
+
+        .task-editor.priority-2 {
+            border-left: 3px solid #ea580c;
+            box-shadow: -2px 0 12px rgba(234, 88, 12, 0.15);
+        }
+
+        .task-editor.priority-3 {
+            border-left: 3px solid #ca8a04;
+            box-shadow: -2px 0 12px rgba(202, 138, 4, 0.15);
+        }
+
+        .task-editor.priority-4 {
+            border-left: 3px solid #65a30d;
+            box-shadow: -2px 0 12px rgba(101, 163, 13, 0.15);
+        }
+
+        .task-editor.priority-5 {
+            border-left: 3px solid #059669;
+            box-shadow: -2px 0 12px rgba(5, 150, 105, 0.15);
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .task-number {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(244, 244, 245, 0.6);
+            width: 20px;
+            text-align: center;
+        }
+
+        .task-title-input {
+            flex: 1;
+            background: rgba(244, 244, 245, 0.06);
+            border: 1px solid rgba(244, 244, 245, 0.08);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #f4f4f5;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .task-title-input::placeholder {
+            color: rgba(244, 244, 245, 0.4);
+        }
+
+        .task-title-input:focus {
+            border-color: rgba(244, 244, 245, 0.2);
+            background: rgba(244, 244, 245, 0.1);
+            box-shadow: 0 0 0 2px rgba(244, 244, 245, 0.1);
+        }
+
+        .priority-selector {
+            background: rgba(244, 244, 245, 0.06);
+            border: 1px solid rgba(244, 244, 245, 0.08);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #f4f4f5;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .priority-selector:focus {
+            border-color: rgba(244, 244, 245, 0.2);
+            background: rgba(244, 244, 245, 0.1);
+        }
+
+        .priority-selector option {
+            background: #18181b;
+            color: #f4f4f5;
+        }
+
+        .subtasks-section {
+            margin-top: 12px;
+        }
+
+        .subtasks-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .subtasks-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(244, 244, 245, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .add-subtask-btn {
+            padding: 4px 8px;
+            background: rgba(244, 244, 245, 0.06);
+            border: 1px solid rgba(244, 244, 245, 0.08);
+            border-radius: 6px;
+            color: #f4f4f5;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .add-subtask-btn:hover {
+            background: rgba(244, 244, 245, 0.1);
+            border-color: rgba(244, 244, 245, 0.15);
+            transform: scale(1.05);
+        }
+
+        .add-subtask-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .subtasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-left: 20px;
+        }
+
+        .subtask-editor {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(244, 244, 245, 0.04);
+        }
+
+        .subtask-editor:last-child {
+            border-bottom: none;
+        }
+
+        .subtask-input {
+            flex: 1;
+            background: rgba(244, 244, 245, 0.04);
+            border: 1px solid rgba(244, 244, 245, 0.06);
+            border-radius: 6px;
+            padding: 6px 8px;
+            color: #f4f4f5;
+            font-family: inherit;
+            font-size: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .subtask-input::placeholder {
+            color: rgba(244, 244, 245, 0.3);
+        }
+
+        .subtask-input:focus {
+            border-color: rgba(244, 244, 245, 0.15);
+            background: rgba(244, 244, 245, 0.06);
+        }
+
+        .remove-subtask-btn {
+            width: 20px;
+            height: 20px;
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            border-radius: 4px;
+            color: #f87171;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-subtask-btn:hover {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: rgba(220, 38, 38, 0.4);
+            transform: scale(1.1);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding: 20px 16px;
+            border-top: 1px solid rgba(244, 244, 245, 0.08);
+            background: 
+                linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, rgba(244, 244, 245, 0.04) 100%);
+            backdrop-filter: blur(20px);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: 1px solid rgba(244, 244, 245, 0.15);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(244, 244, 245, 0.1);
+            color: #f4f4f5;
+            letter-spacing: 0.025em;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.4), transparent);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            background: rgba(244, 244, 245, 0.15);
+            border-color: rgba(244, 244, 245, 0.25);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn.primary {
+            background: #71717a;
+            border-color: #71717a;
+            color: #ffffff;
+        }
+
+        .btn.primary:hover {
+            background: #787887;
+            border-color: #787887;
+        }
+
+        .btn.danger {
+            background: rgba(220, 38, 38, 0.1);
+            border-color: rgba(220, 38, 38, 0.3);
+            color: #f87171;
+        }
+
+        .btn.danger:hover {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: rgba(220, 38, 38, 0.5);
+        }
+
+        /* Custom Scrollbar */
+        .edit-form::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .edit-form::-webkit-scrollbar-track {
+            background: rgba(244, 244, 245, 0.02);
+            border-radius: 3px;
+        }
+
+        .edit-form::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, rgba(244, 244, 245, 0.3) 0%, rgba(244, 244, 245, 0.2) 100%);
+            border-radius: 3px;
+            border: 1px solid rgba(244, 244, 245, 0.1);
+        }
+
+        .edit-form::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, rgba(244, 244, 245, 0.4) 0%, rgba(244, 244, 245, 0.3) 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="back-button" onclick="goBack()" title="Back to Tasks">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+            </div>
+            <div class="header-content">
+                <h1>Edit Tasks</h1>
+                <div class="subtitle">Configure your priority tasks</div>
+            </div>
+            <div class="window-controls">
+                <button class="window-control-btn minimize" onclick="minimizeWindow()" title="Minimize">−</button>
+                <button class="window-control-btn close" onclick="closeWindow()" title="Close">×</button>
+            </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="edit-form" id="editForm">
+            <!-- Task editors will be generated here -->
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn danger" onclick="resetTasks()">Reset All</button>
+            <button class="btn" onclick="cancelEdit()">Cancel</button>
+            <button class="btn primary" onclick="saveTasks()">Save Tasks</button>
+        </div>
+    </div>
+
+    <script>
+        // Default task structure
+        const defaultTasks = [
+            {
+                id: "task-1",
+                title: "Security vulnerability review",
+                priority: 1,
+                completed: false,
+                collapsed: false,
+                subtasks: [
+                    { id: "subtask-1-1", title: "Scan codebase for SQL injection vulnerabilities", completed: false },
+                    { id: "subtask-1-2", title: "Review authentication mechanisms", completed: true },
+                    { id: "subtask-1-3", title: "Update security documentation", completed: false }
+                ]
+            },
+            {
+                id: "task-2",
+                title: "Q2 budget allocation finalization",
+                priority: 2,
+                completed: false,
+                collapsed: false,
+                subtasks: [
+                    { id: "subtask-2-1", title: "Review department budget requests", completed: true }
+                ]
+            },
+            {
+                id: "task-3",
+                title: "API documentation update",
+                priority: 3,
+                completed: false,
+                collapsed: false,
+                subtasks: []
+            },
+            {
+                id: "task-4",
+                title: "",
+                priority: 4,
+                completed: false,
+                collapsed: false,
+                subtasks: []
+            },
+            {
+                id: "task-5",
+                title: "",
+                priority: 5,
+                completed: false,
+                collapsed: false,
+                subtasks: []
+            }
+        ];
+
+        let currentTasks = [];
+
+        // Priority labels
+        const priorityLabels = {
+            1: "Critical",
+            2: "High", 
+            3: "Medium",
+            4: "Low",
+            5: "Minimal"
+        };
+
+        // Load tasks from localStorage or use defaults
+        function loadTasks() {
+            const saved = localStorage.getItem('taskManagerTasks');
+            if (saved) {
+                currentTasks = JSON.parse(saved);
+            } else {
+                currentTasks = JSON.parse(JSON.stringify(defaultTasks));
+            }
+            
+            // Ensure we always have exactly 5 tasks
+            while (currentTasks.length < 5) {
+                currentTasks.push({
+                    id: `task-${currentTasks.length + 1}`,
+                    title: "",
+                    priority: currentTasks.length + 1,
+                    completed: false,
+                    collapsed: false,
+                    subtasks: []
+                });
+            }
+            currentTasks = currentTasks.slice(0, 5); // Ensure max 5 tasks
+        }
+
+        // Generate unique ID
+        function generateId() {
+            return 'id-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Create task editor HTML
+        function createTaskEditor(task, index) {
+            const taskNumber = index + 1;
+            
+            return `
+                <div class="task-editor priority-${task.priority}" data-task-id="${task.id}">
+                    <div class="task-header">
+                        <div class="task-number">${taskNumber}</div>
+                        <input 
+                            type="text" 
+                            class="task-title-input" 
+                            value="${task.title}"
+                            placeholder="Enter task title..."
+                            onchange="updateTaskTitle('${task.id}', this.value)"
+                        />
+                        <select 
+                            class="priority-selector" 
+                            onchange="updateTaskPriority('${task.id}', this.value)"
+                        >
+                            ${Object.entries(priorityLabels).map(([value, label]) => 
+                                `<option value="${value}" ${task.priority == value ? 'selected' : ''}>${label}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="subtasks-section">
+                        <div class="subtasks-header">
+                            <div class="subtasks-label">Subtasks (${task.subtasks.length}/5)</div>
+                            <button 
+                                class="add-subtask-btn" 
+                                onclick="addSubtask('${task.id}')"
+                                ${task.subtasks.length >= 5 ? 'disabled' : ''}
+                            >
+                                <span>+</span> Add Subtask
+                            </button>
+                        </div>
+                        <div class="subtasks-list" id="subtasks-${task.id}">
+                            ${task.subtasks.map((subtask, subIndex) => createSubtaskEditor(task.id, subtask, subIndex)).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create subtask editor HTML
+        function createSubtaskEditor(taskId, subtask, index) {
+            return `
+                <div class="subtask-editor" data-subtask-id="${subtask.id}">
+                    <input 
+                        type="text" 
+                        class="subtask-input" 
+                        value="${subtask.title}"
+                        placeholder="Enter subtask..."
+                        onchange="updateSubtaskTitle('${taskId}', '${subtask.id}', this.value)"
+                    />
+                    <button 
+                        class="remove-subtask-btn" 
+                        onclick="removeSubtask('${taskId}', '${subtask.id}')"
+                        title="Remove subtask"
+                    >
+                        ×
+                    </button>
+                </div>
+            `;
+        }
+
+        // Update task title
+        function updateTaskTitle(taskId, title) {
+            const task = currentTasks.find(t => t.id === taskId);
+            if (task) {
+                task.title = title;
+            }
+        }
+
+        // Update task priority
+        function updateTaskPriority(taskId, priority) {
+            const task = currentTasks.find(t => t.id === taskId);
+            if (task) {
+                task.priority = parseInt(priority);
+                // Update visual priority class
+                const editor = document.querySelector(`[data-task-id="${taskId}"]`);
+                if (editor) {
+                    editor.className = `task-editor priority-${priority}`;
+                }
+            }
+        }
+
+        // Add subtask
+        function addSubtask(taskId) {
+            const task = currentTasks.find(t => t.id === taskId);
+            if (task && task.subtasks.length < 5) {
+                const newSubtask = {
+                    id: generateId(),
+                    title: "",
+                    completed: false
+                };
+                task.subtasks.push(newSubtask);
+                renderSubtasks(taskId);
+                updateSubtaskHeader(taskId);
+            }
+        }
+
+        // Remove subtask
+        function removeSubtask(taskId, subtaskId) {
+            const task = currentTasks.find(t => t.id === taskId);
+            if (task) {
+                task.subtasks = task.subtasks.filter(s => s.id !== subtaskId);
+                renderSubtasks(taskId);
+                updateSubtaskHeader(taskId);
+            }
+        }
+
+        // Update subtask title
+        function updateSubtaskTitle(taskId, subtaskId, title) {
+            const task = currentTasks.find(t => t.id === taskId);
+            if (task) {
+                const subtask = task.subtasks.find(s => s.id === subtaskId);
+                if (subtask) {
+                    subtask.title = title;
+                }
+            }
+        }
+
+        // Render subtasks for a specific task
+        function renderSubtasks(taskId) {
+            const task = currentTasks.find(t => t.id === taskId);
+            const container = document.getElementById(`subtasks-${taskId}`);
+            if (task && container) {
+                container.innerHTML = task.subtasks.map((subtask, index) => 
+                    createSubtaskEditor(taskId, subtask, index)
+                ).join('');
+            }
+        }
+
+        // Update subtask header
+        function updateSubtaskHeader(taskId) {
+            const task = currentTasks.find(t => t.id === taskId);
+            const editor = document.querySelector(`[data-task-id="${taskId}"]`);
+            if (task && editor) {
+                const header = editor.querySelector('.subtasks-label');
+                const addBtn = editor.querySelector('.add-subtask-btn');
+                if (header) {
+                    header.textContent = `Subtasks (${task.subtasks.length}/5)`;
+                }
+                if (addBtn) {
+                    addBtn.disabled = task.subtasks.length >= 5;
+                }
+            }
+        }
+
+        // Render all task editors
+        function renderTasks() {
+            const form = document.getElementById('editForm');
+            form.innerHTML = currentTasks.map((task, index) => createTaskEditor(task, index)).join('');
+        }
+
+        // Save tasks to localStorage
+        function saveTasks() {
+            localStorage.setItem('taskManagerTasks', JSON.stringify(currentTasks));
+            
+            // Show success feedback
+            const saveBtn = document.querySelector('.btn.primary');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Saved!';
+            saveBtn.style.background = '#059669';
+            
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+                saveBtn.style.background = '';
+                goBack();
+            }, 1000);
+        }
+
+        // Cancel edit and go back
+        function cancelEdit() {
+            if (confirm('Are you sure? Any unsaved changes will be lost.')) {
+                goBack();
+            }
+        }
+
+        // Reset all tasks to empty
+        function resetTasks() {
+            if (confirm('Are you sure you want to reset all tasks? This cannot be undone.')) {
+                currentTasks = currentTasks.map((task, index) => ({
+                    id: task.id,
+                    title: "",
+                    priority: index + 1,
+                    completed: false,
+                    collapsed: false,
+                    subtasks: []
+                }));
+                renderTasks();
+            }
+        }
+
+        // Navigate back
+        function goBack() {
+            if (typeof window.electronAPI !== 'undefined') {
+                // Electron environment - could navigate or close window
+                window.history.back();
+            } else {
+                // Browser environment
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Window controls
+        async function minimizeWindow() {
+            try {
+                if (typeof window.electronAPI !== 'undefined') {
+                    await window.electronAPI.minimizeWindow();
+                }
+            } catch (error) {
+                console.error('Error minimizing window:', error);
+            }
+        }
+
+        async function closeWindow() {
+            try {
+                if (typeof window.electronAPI !== 'undefined') {
+                    await window.electronAPI.closeWindow();
+                } else {
+                    window.close();
+                }
+            } catch (error) {
+                console.error('Error closing window:', error);
+                window.close();
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        saveTasks();
+                        break;
+                    case 'Escape':
+                        e.preventDefault();
+                        cancelEdit();
+                        break;
+                }
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTasks();
+            renderTasks();
+        });
+    </script>
+</body>
+</html>

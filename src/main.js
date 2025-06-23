@@ -58,6 +58,7 @@ function createMainWindow() {
       minHeight: 600,
       center: true,
       resizable: true,
+      frame: false,
       parent: mainWindow,
       modal: false,
       webPreferences: {
