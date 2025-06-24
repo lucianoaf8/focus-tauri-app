@@ -238,6 +238,8 @@
             gap: 12px;
             overflow-y: auto;
             scroll-behavior: smooth;
+            min-height: 0; /* Allow flex shrinking */
+            max-height: calc(100vh - 400px); /* Prevent expansion beyond viewport */
         }
 
         .task-item {
@@ -253,19 +255,23 @@
                 linear-gradient(135deg, rgba(244, 244, 245, 0.08) 0%, rgba(244, 244, 245, 0.02) 100%),
                 linear-gradient(45deg, transparent 30%, rgba(244, 244, 245, 0.02) 50%, transparent 70%);
             animation: slideIn 0.6s ease-out backwards;
+            flex-shrink: 0; /* Prevent task cards from shrinking */
+            min-height: 60px; /* Consistent minimum height */
         }
 
-        .task-item:nth-child(1) { animation-delay: 0.1s; }
-        .task-item:nth-child(2) { animation-delay: 0.2s; }
-        .task-item:nth-child(3) { animation-delay: 0.3s; }
-        .task-item:nth-child(4) { animation-delay: 0.4s; }
-        .task-item:nth-child(5) { animation-delay: 0.5s; }
+        .task-item:not(.subtask):nth-child(1) { animation-delay: 0.1s; }
+        .task-item:not(.subtask):nth-child(2) { animation-delay: 0.2s; }
+        .task-item:not(.subtask):nth-child(3) { animation-delay: 0.3s; }
+        .task-item:not(.subtask):nth-child(4) { animation-delay: 0.4s; }
+        .task-item:not(.subtask):nth-child(5) { animation-delay: 0.5s; }
 
         .task-main {
             display: flex;
             align-items: center;
             padding: 16px 14px;
             cursor: pointer;
+            height: 60px; /* Fixed height for consistency */
+            box-sizing: border-box;
         }
 
         .task-item.empty {
@@ -278,49 +284,55 @@
             pointer-events: none;
         }
 
-        .task-item:not(.empty)::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(244, 244, 245, 0.1) 0%, transparent 50%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .task-item:not(.empty)::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.1), transparent);
-            transition: left 0.6s ease;
-            pointer-events: none;
-        }
-
-        .task-item:not(.empty):hover::before {
-            opacity: 1;
-        }
-
-        .task-item:not(.empty):hover::after {
-            left: 100%;
-        }
-
+        /* FIXED: Simplified hover effects with accent colors restored */
         .task-item:not(.empty):hover {
-            transform: translateY(-2px) scale(1.01);
-            background: 
-                linear-gradient(135deg, rgba(244, 244, 245, 0.12) 0%, rgba(244, 244, 245, 0.04) 100%),
-                linear-gradient(45deg, transparent 30%, rgba(244, 244, 245, 0.04) 50%, transparent 70%);
-            border-color: rgba(244, 244, 245, 0.12);
+            transform: translateY(-1px) scale(1.005);
+            background: rgba(244, 244, 245, 0.12);
+            border-color: rgba(244, 244, 245, 0.15);
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                0 4px 16px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(244, 244, 245, 0.2);
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Restore priority accent colors on hover */
+        .task-item.priority-1:not(.empty):hover {
+            border-left-color: #dc2626;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.15),
+                -2px 0 12px rgba(220, 38, 38, 0.25);
+        }
+
+        .task-item.priority-2:not(.empty):hover {
+            border-left-color: #ea580c;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.15),
+                -2px 0 12px rgba(234, 88, 12, 0.25);
+        }
+
+        .task-item.priority-3:not(.empty):hover {
+            border-left-color: #ca8a04;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.15),
+                -2px 0 12px rgba(202, 138, 4, 0.25);
+        }
+
+        .task-item.priority-4:not(.empty):hover {
+            border-left-color: #65a30d;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.15),
+                -2px 0 12px rgba(101, 163, 13, 0.25);
+        }
+
+        .task-item.priority-5:not(.empty):hover {
+            border-left-color: #059669;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.15),
+                -2px 0 12px rgba(5, 150, 105, 0.25);
         }
 
         .task-item.completed {
@@ -437,6 +449,7 @@
             font-weight: 500;
             color: #f4f4f5;
             transition: all 0.3s ease;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
         }
 
         .task-title.completed {
@@ -517,88 +530,74 @@
             background: linear-gradient(90deg, transparent, rgba(244, 244, 245, 0.4), transparent);
         }
 
-        /* Subtasks */
-        .subtasks-container {
-            margin-left: 30px;
-            margin-right: 14px;
-            margin-bottom: 8px;
-            border-left: 1px solid rgba(244, 244, 245, 0.1);
-            padding-left: 16px;
-            display: none;
+        /* Subtask cards - standalone items that inherit parent priority styling */
+        .task-item.subtask {
+            margin-left: 20px;
+            transform: scale(0.96);
+            opacity: 0.9;
+            border-left-width: 2px;
+            min-height: 50px; /* Slightly smaller but consistent height */
+            animation: subtaskSlideIn 0.3s ease-out;
         }
 
-        .subtasks-container.expanded {
-            display: block;
-            animation: slideIn 0.3s ease-out;
+        .task-item.subtask:hover {
+            opacity: 1;
+            transform: translateY(-1px) scale(0.97);
         }
 
-        .subtask-item {
-            display: flex;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(244, 244, 245, 0.04);
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .task-item.subtask .task-main {
+            padding: 12px 14px;
+            height: 50px; /* Fixed height for subtasks */
         }
 
-        .subtask-item:last-child {
-            border-bottom: none;
+        .task-item.subtask .task-title {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(244, 244, 245, 0.85);
         }
 
-        .subtask-item:hover {
-            background: rgba(244, 244, 245, 0.04);
-            margin: 0 -8px;
-            padding: 8px 8px;
-            border-radius: 6px;
-        }
-
-        .subtask-checkbox {
+        .task-item.subtask .task-checkbox {
             width: 14px;
             height: 14px;
-            border: 1px solid rgba(244, 244, 245, 0.3);
-            border-radius: 50%;
-            margin-right: 10px;
-            transition: all 0.3s ease;
-            position: relative;
-            background: rgba(244, 244, 245, 0.05);
-            cursor: pointer;
-            flex-shrink: 0;
+            border-width: 1px;
         }
 
-        .subtask-checkbox:hover {
-            border-color: rgba(244, 244, 245, 0.5);
-            transform: scale(1.1);
-        }
-
-        .subtask-checkbox.completed {
-            background: linear-gradient(135deg, #71717a 0%, #52525b 100%);
-            border-color: #71717a;
-        }
-
-        .subtask-checkbox.completed::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ffffff;
+        .task-item.subtask .task-checkbox.completed::after {
             font-size: 8px;
-            font-weight: 700;
         }
 
-        .subtask-title {
-            flex: 1;
-            font-size: 11px;
-            line-height: 1.3;
-            font-weight: 400;
-            color: rgba(244, 244, 245, 0.8);
-            transition: all 0.3s ease;
+        /* Subtask slide-in animation */
+        @keyframes subtaskSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px) scale(0.95);
+                max-height: 0;
+                margin-bottom: 0;
+            }
+            to {
+                opacity: 0.9;
+                transform: translateX(0) scale(0.96);
+                max-height: 50px;
+                margin-bottom: 12px;
+            }
         }
 
-        .subtask-title.completed {
-            text-decoration: line-through;
-            color: #71717a;
+        /* Subtask slide-out animation */
+        @keyframes subtaskSlideOut {
+            from {
+                opacity: 0.9;
+                transform: translateX(0) scale(0.96);
+                max-height: 50px;
+                margin-bottom: 12px;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-10px) scale(0.95);
+                max-height: 0;
+                margin-bottom: 0;
+            }
         }
+
 
         /* Timer Section */
         .timer-section {
@@ -968,55 +967,55 @@
         }
 
         // Create task HTML
-        function createTaskHTML(task, index) {
+        function createTaskHTML(task, index, isSubtask = false, parentTask = null) {
             const isEmpty = !task.title.trim();
-            const stats = getCompletionStats(task);
-            const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+            const stats = !isSubtask ? getCompletionStats(task) : null;
+            const hasSubtasks = !isSubtask && task.subtasks && task.subtasks.length > 0;
             
-            let taskClasses = ['task-item', `priority-${task.priority}`];
+            let taskClasses = ['task-item'];
+            if (isSubtask) {
+                taskClasses.push('subtask', `priority-${parentTask.priority}`);
+            } else {
+                taskClasses.push(`priority-${task.priority}`);
+            }
             if (isEmpty) taskClasses.push('empty');
             if (task.completed) taskClasses.push('completed');
             
             let taskInfoHTML = '';
-            if (hasSubtasks) {
-                taskInfoHTML += `
-                    <div class="subtasks-toggle ${task.collapsed ? '' : 'rotated'}" 
-                         onclick="toggleSubtasks('${task.id}', event)">
-                        ▶
-                    </div>
-                `;
+            if (!isSubtask) {
+                if (hasSubtasks) {
+                    taskInfoHTML += `
+                        <div class="subtasks-toggle ${task.collapsed ? '' : 'rotated'}">
+                            ▶
+                        </div>
+                    `;
+                }
+                
+                if (stats) {
+                    taskInfoHTML += `
+                        <div class="completion-counter">${stats.completed}/${stats.total}</div>
+                    `;
+                }
+                
+                if (!isEmpty) {
+                    taskInfoHTML += `
+                        <div class="priority-badge">${priorityLabels[task.priority]}</div>
+                    `;
+                }
             }
             
-            if (stats) {
-                taskInfoHTML += `
-                    <div class="completion-counter">${stats.completed}/${stats.total}</div>
-                `;
-            }
+            const clickHandler = isSubtask ? 
+                `handleSubtaskClick('${parentTask.id}', '${task.id}', event)` : 
+                `handleTaskClick('${task.id}', event)`;
             
-            if (!isEmpty) {
-                taskInfoHTML += `
-                    <div class="priority-badge">${priorityLabels[task.priority]}</div>
-                `;
-            }
-            
-            let subtasksHTML = '';
-            if (hasSubtasks) {
-                subtasksHTML = `
-                    <div class="subtasks-container ${task.collapsed ? '' : 'expanded'}" id="subtasks-${task.id}">
-                        ${task.subtasks.map(subtask => `
-                            <div class="subtask-item" onclick="toggleSubtask('${task.id}', '${subtask.id}', event)">
-                                <div class="subtask-checkbox ${subtask.completed ? 'completed' : ''}"></div>
-                                <div class="subtask-title ${subtask.completed ? 'completed' : ''}">${subtask.title}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
+            const toggleHandler = isSubtask ? 
+                `toggleSubtask('${parentTask.id}', '${task.id}', event)` : 
+                `toggleTask('${task.id}', event)`;
             
             return `
-                <div class="${taskClasses.join(' ')}" data-task-id="${task.id}">
-                    <div class="task-main" onclick="toggleTask('${task.id}', event)">
-                        <div class="task-checkbox ${task.completed ? 'completed' : ''}"></div>
+                <div class="${taskClasses.join(' ')}" data-task-id="${task.id}" ${isSubtask ? `data-parent-id="${parentTask.id}"` : ''}>
+                    <div class="task-main" onclick="${clickHandler}">
+                        <div class="task-checkbox ${task.completed ? 'completed' : ''}" onclick="${toggleHandler}"></div>
                         <div class="task-content">
                             <div class="task-title ${task.completed ? 'completed' : ''} ${isEmpty ? 'empty' : ''}">
                                 ${isEmpty ? 'Empty task' : task.title}
@@ -1026,18 +1025,58 @@
                             </div>
                         </div>
                     </div>
-                    ${subtasksHTML}
                 </div>
             `;
         }
 
-        // Render all tasks
+        // Render all tasks with smooth animations
         function renderTasks() {
             const container = document.getElementById('tasksContainer');
-            container.innerHTML = currentTasks.map((task, index) => createTaskHTML(task, index)).join('');
+            const existingSubtasks = container.querySelectorAll('.task-item.subtask');
+            
+            // Mark existing subtasks for removal animation
+            existingSubtasks.forEach(subtask => {
+                subtask.style.animation = 'subtaskSlideOut 0.2s ease-out forwards';
+            });
+            
+            // Delay the re-render to allow slide-out animation
+            setTimeout(() => {
+                let html = '';
+                
+                currentTasks.forEach((task, index) => {
+                    // Add main task
+                    html += createTaskHTML(task, index);
+                    
+                    // Add subtasks if expanded and has subtasks
+                    if (task.subtasks && task.subtasks.length > 0 && !task.collapsed) {
+                        task.subtasks.forEach((subtask, subtaskIndex) => {
+                            html += createTaskHTML(subtask, index, true, task);
+                        });
+                    }
+                });
+                
+                container.innerHTML = html;
+                
+                // Trigger smooth scroll to maintain position if needed
+                const scrollPosition = container.scrollTop;
+                requestAnimationFrame(() => {
+                    container.scrollTop = scrollPosition;
+                });
+            }, existingSubtasks.length > 0 ? 200 : 0);
         }
 
-        // Toggle task completion
+        // FIXED: Handle task area clicks (for subtask expansion)
+        function handleTaskClick(taskId, event) {
+            const task = currentTasks.find(t => t.id === taskId);
+            if (!task || task.title.trim() === '') return;
+            
+            // Only expand/collapse if task has subtasks
+            if (task.subtasks && task.subtasks.length > 0) {
+                toggleSubtasks(taskId, event);
+            }
+        }
+
+        // FIXED: Toggle task completion (checkbox only)
         function toggleTask(taskId, event) {
             event.stopPropagation();
             const task = currentTasks.find(t => t.id === taskId);
@@ -1057,7 +1096,14 @@
             }
         }
 
-        // Toggle subtask completion
+        // Handle subtask area clicks
+        function handleSubtaskClick(parentTaskId, subtaskId, event) {
+            // For now, clicking the subtask area does nothing
+            // Could add edit functionality here in the future
+            event.stopPropagation();
+        }
+
+        // Toggle subtask completion (checkbox only)
         function toggleSubtask(taskId, subtaskId, event) {
             event.stopPropagation();
             const task = currentTasks.find(t => t.id === taskId);
@@ -1071,28 +1117,42 @@
             }
         }
 
-        // Toggle subtasks visibility
+        // Toggle subtasks visibility with accordion behavior and smooth animation
         function toggleSubtasks(taskId, event) {
             event.stopPropagation();
             const task = currentTasks.find(t => t.id === taskId);
-            if (task) {
-                task.collapsed = !task.collapsed;
-                saveTasks();
-                
-                // Update the UI
-                const container = document.getElementById(`subtasks-${taskId}`);
-                const toggle = event.target;
-                
-                if (container) {
-                    if (task.collapsed) {
-                        container.classList.remove('expanded');
-                        toggle.classList.remove('rotated');
-                    } else {
-                        container.classList.add('expanded');
-                        toggle.classList.add('rotated');
-                    }
+            if (!task) return;
+            
+            // Store scroll position
+            const container = document.getElementById('tasksContainer');
+            const scrollPosition = container.scrollTop;
+
+            // ACCORDION BEHAVIOR: Close all other expanded tasks first
+            let hasOtherExpanded = false;
+            currentTasks.forEach(t => {
+                if (t.id !== taskId && !t.collapsed) {
+                    t.collapsed = true;
+                    hasOtherExpanded = true;
                 }
-            }
+            });
+
+            // Toggle current task
+            const wasCollapsed = task.collapsed;
+            task.collapsed = !task.collapsed;
+            saveTasks();
+            
+            // Add a slight delay if we're closing other tasks first
+            const delay = hasOtherExpanded && !wasCollapsed ? 150 : 0;
+            
+            setTimeout(() => {
+                // Re-render to show/hide subtask cards
+                renderTasks();
+                
+                // Restore scroll position after animation
+                setTimeout(() => {
+                    container.scrollTop = scrollPosition;
+                }, 50);
+            }, delay);
         }
 
         // Timer functionality
